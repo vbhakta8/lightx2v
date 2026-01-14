@@ -142,7 +142,8 @@ class WanI2VFullServer:
 
         # Full model settings
         infer_steps = int(os.environ.get('WAN_INFER_STEPS', '40'))  # Full model = 40 steps
-        enable_cfg = truthy(os.environ.get('WAN_ENABLE_CFG', 'false'))
+        enable_cfg = truthy(os.environ.get('WAN_ENABLE_CFG', 'true'))  # CFG required for full model
+        guidance_scale = float(os.environ.get('WAN_GUIDANCE_SCALE', '5.0'))  # Default CFG strength
         boundary = float(os.environ.get('WAN_BOUNDARY', '0.900'))  # Switch at 90%
 
         # Resolution and frame settings
@@ -152,8 +153,8 @@ class WanI2VFullServer:
         default_fps = int(os.environ.get('WAN_FPS', '24'))
 
         logger.info(f"Creating generator: infer_steps={infer_steps}, enable_cfg={enable_cfg}, "
-                    f"boundary={boundary}, resolution={default_width}x{default_height}, "
-                    f"frames={default_num_frames}, fps={default_fps}")
+                    f"guidance_scale={guidance_scale}, boundary={boundary}, "
+                    f"resolution={default_width}x{default_height}, frames={default_num_frames}, fps={default_fps}")
 
         self.pipe.create_generator(
             attn_mode="flash_attn3",  # Best for L40/A100
@@ -161,7 +162,7 @@ class WanI2VFullServer:
             height=default_height,
             width=default_width,
             num_frames=default_num_frames,
-            guidance_scale=1 if not enable_cfg else [3.5, 3.5],
+            guidance_scale=guidance_scale if enable_cfg else 1.0,  # CFG enabled by default for full model
             sample_shift=5.0,
             fps=default_fps,
             boundary=boundary,

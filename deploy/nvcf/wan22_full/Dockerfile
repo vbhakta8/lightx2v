@@ -54,7 +54,10 @@ ENV WAN_TASK=i2v
 
 # Full model uses 40 steps (not 4 like distilled)
 ENV WAN_INFER_STEPS=40
-ENV WAN_ENABLE_CFG=false
+
+# CFG (Classifier-Free Guidance) - required for full model quality
+ENV WAN_ENABLE_CFG=true
+ENV WAN_GUIDANCE_SCALE=5.0
 
 # No quantization - vanilla FP16/BF16
 ENV WAN_DIT_QUANTIZED=false
